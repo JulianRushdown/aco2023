@@ -20,6 +20,13 @@ var numberMap = map[string]string{
 	"nine":  "9",
 }
 
+type number struct {
+	value        string
+	writtenValue string
+	lowestIdx    int
+	highestIdx   int
+}
+
 func main() {
 	file, err := os.Open("input.txt")
 	if err != nil {
@@ -29,43 +36,55 @@ func main() {
 
 	sum := 0
 	for scanner.Scan() {
-		var nums []int64
-
 		line := scanner.Text()
-
-		for {
-			earliestIndex := len(line)
-			earliestKey := ""
-
-			for k, _ := range numberMap {
-				index := strings.Index(line, k)
-				if index != -1 && index < earliestIndex {
-					earliestIndex = index
-					earliestKey = k
-				}
+		var writtenNumbers []number
+		for k, v := range numberMap {
+			if strings.Contains(line, k) {
+				firstIndex := strings.Index(line, k)
+				lastIndex := strings.LastIndex(line, k)
+				writtenNumbers = append(writtenNumbers, number{
+					value:        v,
+					writtenValue: k,
+					lowestIdx:    firstIndex,
+					highestIdx:   lastIndex,
+				})
 			}
+			if strings.Contains(line, v) {
+				firstIndex := strings.Index(line, v)
+				lastIndex := strings.LastIndex(line, v)
+				writtenNumbers = append(writtenNumbers, number{
+					value:        v,
+					writtenValue: k,
+					lowestIdx:    firstIndex,
+					highestIdx:   lastIndex,
+				})
+			}
+		}
 
-			if earliestKey == "" {
+		var firstDigit, lastDigit string
+		currentLowestIdx := len(line)
+		currentHighestIdx := 0
+		for _, num := range writtenNumbers {
+			if len(writtenNumbers) == 1 {
+				firstDigit = writtenNumbers[0].value
+				lastDigit = writtenNumbers[0].value
 				break
 			}
-
-			line = strings.Replace(line, earliestKey, numberMap[earliestKey], 1)
-		}
-
-		chars := strings.Split(line, "")
-		for _, char := range chars {
-			num, err := strconv.ParseInt(char, 0, 10)
-			if err == nil {
-				nums = append(nums, num)
+			if num.highestIdx > currentHighestIdx {
+				currentHighestIdx = num.highestIdx
+				lastDigit = num.value
+			}
+			if num.lowestIdx < currentLowestIdx {
+				currentLowestIdx = num.lowestIdx
+				firstDigit = num.value
 			}
 		}
 
-		val, err := strconv.Atoi(fmt.Sprintf("%d%d", nums[0], nums[0]))
+		finalDigit, err := strconv.Atoi(fmt.Sprintf("%s%s", firstDigit, lastDigit))
 		if err == nil {
-			sum += val
+			sum += finalDigit
 		}
 	}
-
 	// total
 	fmt.Print(sum)
 }
