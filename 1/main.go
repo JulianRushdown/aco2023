@@ -39,26 +39,21 @@ func main() {
 		line := scanner.Text()
 		var writtenNumbers []number
 		for k, v := range numberMap {
+			var firstIndex, lastIndex int
 			if strings.Contains(line, k) {
-				firstIndex := strings.Index(line, k)
-				lastIndex := strings.LastIndex(line, k)
-				writtenNumbers = append(writtenNumbers, number{
-					value:        v,
-					writtenValue: k,
-					lowestIdx:    firstIndex,
-					highestIdx:   lastIndex,
-				})
+				firstIndex = strings.Index(line, k)
+				lastIndex = strings.LastIndex(line, k)
 			}
 			if strings.Contains(line, v) {
-				firstIndex := strings.Index(line, v)
-				lastIndex := strings.LastIndex(line, v)
-				writtenNumbers = append(writtenNumbers, number{
-					value:        v,
-					writtenValue: k,
-					lowestIdx:    firstIndex,
-					highestIdx:   lastIndex,
-				})
+				firstIndex = strings.Index(line, v)
+				lastIndex = strings.LastIndex(line, v)
 			}
+			writtenNumbers = append(writtenNumbers, number{
+				value:        v,
+				writtenValue: k,
+				lowestIdx:    firstIndex,
+				highestIdx:   lastIndex,
+			})
 		}
 
 		var firstDigit, lastDigit string
